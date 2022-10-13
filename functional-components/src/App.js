@@ -1,45 +1,106 @@
-import logo from './logo.svg';
-import Movies from './movies/movies';
-import './App.css';
+import React, { Component } from 'react';
+import {
+  Carousel,
+  CarouselItem,
+  CarouselControl,
+  CarouselIndicators,
+  CarouselCaption
+} from 'reactstrap';
+import 'bootstrap/dist/css/bootstrap.min.css';
+const items = [
+  {
+    src: require ('./assets/img/Aconcagua.jpg'),
+    altText: 'Imagen1',
+    caption: 'Cerro Aconcagua'
+  },
+  {
+    src: require ('./assets/img/Monumento.jpg'),
+    altText: 'Imagen2',
+    caption: 'Monumento al Ejército de los Andes'
+  },
+  {
+    src: require ('./assets/img/Potrerillos.jpg'),
+    altText: 'Imagen3',
+    caption: 'Dique Potrerillos'
+  },
+  {
+    src: require ('./assets/img/ValleGrande.jpg'),
+    altText: 'Imagen4',
+    caption: 'Dique Valle Grande'
+  },
+  {
+    src: require ('./assets/img/Viñedo.jpg'),
+    altText: 'Imagen5',
+    caption: 'Viñedo Mendocino'
+  }
+];
 
-const myData = [
-  { Framework: "Boostrap"} ,
-  { Framework: "Material"} ,
-  { Framework: "Tailwind"} ,
-  { Framework: "Next"}
-]
-//[ "Bootstrap", "Material", "Tailwind", "Next" ];
+class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { activeIndex: 0 };
+    this.next = this.next.bind(this);
+    this.previous = this.previous.bind(this);
+    this.goToIndex = this.goToIndex.bind(this);
+    this.onExiting = this.onExiting.bind(this);
+    this.onExited = this.onExited.bind(this);
+  }
 
-/*function SumoDosNumero(a,b ){
-  return a+b;
-}*/
+  onExiting() {
+    this.animating = true;
+  }
 
-// Repaso funcion anonima/arrow function
-/*const SumoDosNumero = (a,b) => {
-  return a+b;
-}*/
+  onExited() {
+    this.animating = false;
+  }
 
-const words = ['spray', 'limit', 'elite', 'exuberant', 'destruction', 'present'];
+  next() {
+    if (this.animating) return;
+    const nextIndex = this.state.activeIndex === items.length - 1 ? 0 : this.state.activeIndex + 1;
+    this.setState({ activeIndex: nextIndex });
+  }
 
-function App() {
+  previous() {
+    if (this.animating) return;
+    const nextIndex = this.state.activeIndex === 0 ? items.length - 1 : this.state.activeIndex - 1;
+    this.setState({ activeIndex: nextIndex });
+  }
 
-  const filterResult = words.filter(word => word.length > 6);
+  goToIndex(newIndex) {
+    if (this.animating) return;
+    this.setState({ activeIndex: newIndex });
+  }
 
-  const myDataList = myData.map( (element) => {
-      return ( <h2> { element.Framework } </h2> )
-  } );
+  render() {
+    const { activeIndex } = this.state;
 
-  /* <h2> { myData[0].Framework } </h2>
-      <h2> { myData[1].Framework } </h2>
-      <h2> { myData[2].Framework } </h2>
-      <h2> { myData[3].Framework } </h2>
-*/
-  return (
-    <div className="App">
-      { myDataList }
-      <Movies data={ filterResult } ></Movies>
-    </div>
-  );
+    const slides = items.map((item) => {
+      return (
+        <CarouselItem
+          onExiting={this.onExiting}
+          onExited={this.onExited}
+          key={item.src}
+        >
+          <img src={item.src} alt={item.altText} width="100%" />
+          <CarouselCaption captionText={item.caption} captionHeader={item.caption} />
+        </CarouselItem>
+      );
+    });
+
+    return (
+      <Carousel
+        activeIndex={activeIndex}
+        next={this.next}
+        previous={this.previous}
+      >
+        <CarouselIndicators items={items} activeIndex={activeIndex} onClickHandler={this.goToIndex} />
+        {slides}
+        <CarouselControl direction="prev" directionText="Previous" onClickHandler={this.previous} />
+        <CarouselControl direction="next" directionText="Next" onClickHandler={this.next} />
+      </Carousel>
+    );
+  }
 }
 
-export default App;
+
+export default App;                                                                      
